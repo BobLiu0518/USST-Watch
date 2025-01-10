@@ -56,12 +56,26 @@ export default class Student {
                     redirect: 'manual',
                 });
             }
+            const name = await this.queryName();
+            if (!name) {
+                return false;
+            }
+            console.log(`用户 ${name}(${this.username}) 登录成功`);
             return true;
         } catch (err) {
             console.error(`用户 ${this.username} 登录时出现问题：`);
             console.error(err);
             return false;
         }
+    }
+    async queryName(): Promise<string | null> {
+        const response = await this.request(`https://jwgl.usst.edu.cn/jwglxt/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=${Date.now()}&gnmkdm=index`);
+        const body = await response.text();
+        const match = body.match(/<h4 class="media-heading">(.+?)&nbsp;/);
+        if (!match) {
+            return null;
+        }
+        return match[1];
     }
     async queryScore(args: queryScoreArgs): Promise<Object> {
         const response = await this.request('https://jwgl.usst.edu.cn/jwglxt/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005', {
@@ -79,7 +93,7 @@ export default class Student {
                 time: '0',
             }),
         });
-        return JSON.parse(await response.text())['items'];
+        return await response.json()['items'];
     }
     async request(url: string, init: RequestInit = {}): Promise<Response> {
         init.headers = {
