@@ -1,0 +1,16 @@
+{
+    "name": "usst-score-watch",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.ts",
+    "type": "module",
+    "scripts": {
+        "start": "deno run --allow-read --allow-net index.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^22.10.5"
+    }
+}
