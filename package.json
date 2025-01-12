@@ -1,11 +1,11 @@
 {
-    "name": "usst-score-watch",
+    "name": "usst-watch",
     "version": "1.0.0",
     "description": "",
-    "main": "index.ts",
+    "main": "src/index.ts",
     "type": "module",
     "scripts": {
-        "start": "deno run --allow-read --allow-net index.ts"
+        "start": "deno run --allow-read --allow-net src/index.ts"
     },
     "keywords": [],
     "author": "",
