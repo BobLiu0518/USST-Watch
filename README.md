@@ -1,4 +1,6 @@
-# USST Score Watch
+# USST Watch
+
+USST 教务系统监控
 
 ## 运行环境
 
