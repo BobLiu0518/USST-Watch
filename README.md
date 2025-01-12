@@ -12,7 +12,7 @@ $ deno i
 $ mv config.example.ts config.ts
 
 # 编辑 config.ts
-$ node config.ts
+$ code config.ts
 
 # 开始运行
 $ deno run start
