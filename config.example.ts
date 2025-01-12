@@ -1,5 +1,5 @@
-import { addStudent } from './src/student.ts';
-import { scoreWatcher } from './src/watchers/scoreWatcher.ts';
+import { addStudent } from '@/student.ts';
+import { scoreWatcher } from '@/watchers/scoreWatcher.ts';
 
 // 添加用户
 await addStudent({
