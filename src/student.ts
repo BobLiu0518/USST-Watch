@@ -1,4 +1,4 @@
-import { renameKey, base64Decode } from '@/util.ts';
+import { renameKey } from '@/util.ts';
 import type { UserConfig, Score, IWatcher, IStudent } from '@/types/types.ts';
 
 const students: Student[] = [];
@@ -36,7 +36,7 @@ class Student implements IStudent {
     cookies: Record<string, string> = {};
     constructor(config: UserConfig) {
         this.username = config.username;
-        this.password = base64Decode(config.password);
+        this.password = atob(config.password);
         this.watcher = config.watcher;
         if (config.notify !== undefined) {
             this.notify = config.notify;
