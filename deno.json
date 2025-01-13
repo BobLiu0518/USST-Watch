@@ -1,3 +1,9 @@
 {
-    "importMap": "import.json"
+    "tasks": {
+        "start": "deno run --allow-net src/index.ts"
+    },
+    "imports": {
+        "@/": "./src/",
+        "$/": "./"
+    }
 }
