@@ -13,11 +13,7 @@ export async function addStudent(config: UserConfig): Promise<void> {
 export async function monitorAll(silent: boolean = false): Promise<void> {
     for (const student of students) {
         try {
-            await Promise.all(
-                student.watcher.map((watcher) =>
-                    watcher.monitor(student, silent)
-                )
-            );
+            await Promise.all(student.watcher.map((watcher) => watcher.monitor(student, silent)));
         } catch (err) {
             console.error(`获取 ${student.name} 数据时发生错误：`);
             console.error(err);
@@ -42,10 +38,7 @@ class Student implements IStudent {
             this.notify = config.notify;
         } else if (config.post !== undefined) {
             this.notify = (msg: string) => {
-                const url =
-                    typeof config.post === 'function'
-                        ? config.post(msg)
-                        : config.post + msg;
+                const url = typeof config.post === 'function' ? config.post(msg) : config.post + msg;
                 fetch(url).catch((err) => {
                     console.error('发送消息时发生错误：');
                     console.error(err);
@@ -61,9 +54,7 @@ class Student implements IStudent {
         }
         this.name = null;
         try {
-            let response = await this.request(
-                'http://ehall.usst.edu.cn/amp-auth-adapter/login?service=http%3A%2F%2Fjwgl.usst.edu.cn%2Fsso%2Fjziotlogin'
-            );
+            let response = await this.request('http://ehall.usst.edu.cn/amp-auth-adapter/login?service=http%3A%2F%2Fjwgl.usst.edu.cn%2Fsso%2Fjziotlogin');
             let url = response.url;
             const inputs: Record<string, string> = {
                 lt: '',
@@ -74,9 +65,7 @@ class Student implements IStudent {
             };
             const body = await response.text();
             for (const key in inputs) {
-                const pattern = new RegExp(
-                    `<input type="hidden" name="${key}" value="(.*?)"\/?>`
-                );
+                const pattern = new RegExp(`<input type="hidden" name="${key}" value="(.*?)"\/?>`);
                 inputs[key] = (body.match(pattern) ?? [])[1];
             }
             response = await this.request(url, {
@@ -93,10 +82,7 @@ class Student implements IStudent {
             });
             while (response.status == 302) {
                 url = response.headers.get('location') ?? '/';
-                url = url.replace(
-                    /^(http):\/\/jwgl\.usst\.edu\.cn/,
-                    'https://jwgl.usst.edu.cn'
-                );
+                url = url.replace(/^(http):\/\/jwgl\.usst\.edu\.cn/, 'https://jwgl.usst.edu.cn');
                 if (url.match(/^\//)) {
                     url = 'https://jwgl.usst.edu.cn' + url;
                 }
@@ -120,9 +106,7 @@ class Student implements IStudent {
         if (this.name) {
             return this.name;
         }
-        const response = await this.request(
-            `https://jwgl.usst.edu.cn/jwglxt/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=${Date.now()}&gnmkdm=index`
-        );
+        const response = await this.request(`https://jwgl.usst.edu.cn/jwglxt/xtgl/index_cxYhxxIndex.html?xt=jw&localeKey=zh_CN&_=${Date.now()}&gnmkdm=index`);
         const body = await response.text();
         const match = body.match(/<h4 class="media-heading">(.+?)&nbsp;/);
         if (!match) {
@@ -131,32 +115,29 @@ class Student implements IStudent {
         this.name = match[1];
         return this.name;
     }
-
-    async queryScore(
-        academicYear: string,
-        semester?: string
-    ): Promise<Score[]> {
+    async queryScore(academicYear: string, semester?: string): Promise<Score[]> {
         if (!this.name && !(await this.login())) {
             return [];
         }
-        const response = await this.request(
-            'https://jwgl.usst.edu.cn/jwglxt/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005',
-            {
-                method: 'POST',
-                body: new URLSearchParams({
-                    xnm: academicYear,
-                    xqm: semester ?? '',
-                    kcbj: '',
-                    _search: 'false',
-                    nd: Date.now().toString(),
-                    'queryModel.showCount': '5000',
-                    'queryModel.currentPage': '1',
-                    'queryModel.sortName': '',
-                    'queryModel.sortOrder': 'asc',
-                    time: '0',
-                }),
-            }
-        );
+        const response = await this.request('https://jwgl.usst.edu.cn/jwglxt/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005', {
+            method: 'POST',
+            body: new URLSearchParams({
+                xnm: academicYear,
+                xqm: semester ?? '',
+                kcbj: '',
+                _search: 'false',
+                nd: Date.now().toString(),
+                'queryModel.showCount': '5000',
+                'queryModel.currentPage': '1',
+                'queryModel.sortName': '',
+                'queryModel.sortOrder': 'asc',
+                time: '0',
+            }),
+            redirect: 'manual',
+        });
+        if (response.status == 901) {
+            throw new Error('登录已失效');
+        }
         const scores = (await response.json())['items'];
         const keyMap = {
             cj: 'score',
