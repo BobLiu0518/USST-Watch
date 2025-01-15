@@ -1,5 +1,6 @@
 import { addStudent } from '@/student.ts';
 import { scoreWatcher } from '@/watchers/scoreWatcher.ts';
+import { scheduleWatcher } from '@/watchers/scheduleWatcher.ts';
 
 // 添加用户
 await addStudent({
@@ -19,8 +20,17 @@ await addStudent({
         scoreWatcher({
             // 学年
             academicYear: '2024',
+            // 学期
             semester: '3',
+            // 是否展示具体分数
             showScore: true,
+        }),
+        // 课程表监控（适用于一轮选课后）
+        scheduleWatcher({
+            // 学年
+            academicYear: '2024',
+            // 学期
+            semester: '4',
         }),
     ],
 });

@@ -1,5 +1,5 @@
 import { renameKey } from '@/util.ts';
-import type { UserConfig, Score, IWatcher, IStudent } from '@/types/types.ts';
+import type { UserConfig, Score, Course, IWatcher, IStudent } from '@/types/types.ts';
 
 const students: Student[] = [];
 
@@ -116,10 +116,7 @@ class Student implements IStudent {
         return this.name;
     }
     async queryScore(academicYear: string, semester?: string): Promise<Score[]> {
-        if (!this.name && !(await this.login())) {
-            return [];
-        }
-        const response = await this.request('https://jwgl.usst.edu.cn/jwglxt/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005', {
+        const response = await this.requestApi('https://jwgl.usst.edu.cn/jwglxt/cjcx/cjcx_cxXsgrcj.html?doType=query&gnmkdm=N305005', {
             method: 'POST',
             body: new URLSearchParams({
                 xnm: academicYear,
@@ -133,12 +130,8 @@ class Student implements IStudent {
                 'queryModel.sortOrder': 'asc',
                 time: '0',
             }),
-            redirect: 'manual',
         });
-        if (response.status == 901) {
-            throw new Error('登录已失效');
-        }
-        const scores = (await response.json())['items'];
+        const scores: Score[] = (await response.json())['items'];
         const keyMap = {
             cj: 'score',
             jd: 'gpa',
@@ -155,6 +148,41 @@ class Student implements IStudent {
             xfjd: 'creditGpa',
         };
         return renameKey(scores, keyMap);
+    }
+    async querySchedule(academicYear: string, semester: string): Promise<Course[]> {
+        const response = await this.requestApi('https://jwgl.usst.edu.cn/jwglxt/kbcx/xskbcx_cxXsgrkb.html?gnmkdm=N2151', {
+            method: 'POST',
+            body: new URLSearchParams({
+                xnm: academicYear,
+                xqm: semester,
+                kzlx: 'ck',
+                xsdm: '',
+            }),
+        });
+        const schedule = (await response.json())['kbList'];
+        const keyMap = {
+            cdmc: 'classroomName',
+            kcmc: 'courseName',
+            jc: 'coursePeriod',
+            xm: 'teacherName',
+            xqjmc: 'weekday',
+            xqmc: 'campusName',
+            zcd: 'weeks',
+        };
+        return renameKey(schedule, keyMap);
+    }
+    async requestApi(url: string, init: RequestInit = {}): Promise<Response> {
+        if (!this.name && !(await this.login())) {
+            throw new Error(`用户 ${this.username} 未登录`);
+        }
+        const response = await this.request(url, {
+            ...init,
+            redirect: 'manual',
+        });
+        if (response.status == 901) {
+            throw new Error('登录已失效');
+        }
+        return response;
     }
     async request(url: string, init: RequestInit = {}): Promise<Response> {
         init.headers = {

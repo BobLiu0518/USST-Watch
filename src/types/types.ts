@@ -11,6 +11,7 @@ export interface IStudent {
     cookies: Record<string, string>;
     login(reLogin: boolean): Promise<boolean>;
     queryScore(academicYear: string, semester: string): Promise<Score[]>;
+    querySchedule(academicYear: string, semester: string): Promise<Course[]>;
 }
 
 export type UserConfig = {
@@ -35,4 +36,14 @@ export type Score = {
     semester: string;
     credit: string;
     creditGpa: string;
+};
+
+export type Course = {
+    classroomName: string;
+    courseName: string;
+    coursePeriod: string;
+    teacherName: string;
+    weekday: string;
+    campusName: string;
+    weeks: string;
 };
