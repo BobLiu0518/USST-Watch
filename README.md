@@ -12,7 +12,7 @@ USST 教务系统监控
 
 ```shell
 # 配置项目
-$ git clone git@github.com:BobLiu0518/USST-Score-Watch
+$ git clone git@github.com:BobLiu0518/USST-Watch.git
 $ cd USST-Score-Watch
 $ deno i
 
