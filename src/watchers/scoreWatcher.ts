@@ -19,7 +19,7 @@ class ScoreWatcher implements IWatcher {
         for (const { courseName, score: scoreStr } of scores) {
             const courseScore = parseInt(scoreStr);
             const oldScore = this.scoreStore[student.username][courseName];
-            if (oldScore != courseScore) {
+            if (!Object.is(oldScore, courseScore)) {
                 const status = oldScore === undefined ? '发布' : '更新';
                 const msg = this.showScore
                     ? `${student.name} ${courseName} 成绩已${status}：${courseScore}`
